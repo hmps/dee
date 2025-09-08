@@ -258,18 +258,50 @@ function harmonizeCommand(command: SupportedCommand, args: string[], packageMana
 function main(): void {
   const args = process.argv.slice(2);
   
-  if (args.length === 0) {
-    console.error('Usage: d [--debug] <command> [args...]');
-    console.error('Supported commands: ' + SUPPORTED_COMMANDS.join(', '));
-    process.exit(1);
-  }
-  
   // Check for debug flag
   const debugIndex = args.indexOf('--debug');
   const isDebug = debugIndex !== -1;
   
   // Remove debug flag from args
   const cleanArgs = args.filter(arg => arg !== '--debug');
+  
+  // If no arguments provided (or only --debug), run default package manager command
+  if (cleanArgs.length === 0) {
+    const structure = findProjectStructure();
+    if (!structure) {
+      console.error('Error: No package.json found in current directory or parent directories.');
+      process.exit(1);
+    }
+    
+    const { manager: packageManager, reason } = detectPackageManager(structure);
+    const executionDir = structure.localRoot;
+    
+    if (isDebug) {
+      let contextInfo = `Using ${packageManager} (${reason})`;
+      if (structure.monorepoRoot && structure.monorepoRoot !== structure.localRoot) {
+        contextInfo += `\nMonorepo detected: ${structure.monorepoRoot}`;
+        contextInfo += `\nLocal package: ${structure.localRoot}`;
+        contextInfo += `\nExecuting from: ${executionDir}`;
+      }
+      if (structure.gitRoot) {
+        contextInfo += `\nGit root: ${structure.gitRoot}`;
+      }
+      
+      console.log(`${contextInfo}\nCommand: ${packageManager}`);
+    } else {
+      console.log(`Using ${packageManager}: ${packageManager}`);
+    }
+    
+    try {
+      execSync(packageManager, { 
+        stdio: 'inherit',
+        cwd: executionDir
+      });
+    } catch (error: any) {
+      process.exit(error.status || 1);
+    }
+    return;
+  }
   
   if (cleanArgs.length === 0) {
     console.error('Usage: d [--debug] <command> [args...]');
