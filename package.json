@@ -1,0 +1,24 @@
+{
+  "name": "dee",
+  "version": "1.0.0",
+  "description": "A dependency manager wrapper that automatically detects and uses the appropriate package manager",
+  "main": "dist/d.js",
+  "bin": {
+    "d": "dist/d.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["package-manager", "npm", "yarn", "pnpm", "bun", "wrapper"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
