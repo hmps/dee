@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
-const SUPPORTED_COMMANDS = ['add', 'install', 'run', 'build', 'dev', 'typecheck', 'lint'] as const;
+const SUPPORTED_COMMANDS = ['add', 'install', 'run', 'build', 'dev', 'typecheck', 'lint', 'test', 'start', 'format', 'clean', 'watch', 'serve', 'preview', 'check'] as const;
 
 type SupportedCommand = typeof SUPPORTED_COMMANDS[number];
 type PackageManager = 'bun' | 'pnpm' | 'yarn' | 'npm';
@@ -167,7 +167,7 @@ function getExecutionDirectory(command: SupportedCommand, structure: ProjectStru
   }
   
   // For script commands, check if the script exists locally first
-  const scriptCommands = ['run', 'build', 'dev', 'typecheck', 'lint'];
+  const scriptCommands = ['run', 'build', 'dev', 'typecheck', 'lint', 'test', 'start', 'format', 'clean', 'watch', 'serve', 'preview', 'check'];
   
   if (scriptCommands.includes(command)) {
     // Check if script exists in local package.json
@@ -244,6 +244,30 @@ function harmonizeCommand(command: SupportedCommand, args: string[], packageMana
       
     case 'lint':
       return [packageManager, 'run', 'lint'];
+      
+    case 'test':
+      return [packageManager, 'run', 'test'];
+      
+    case 'start':
+      return [packageManager, 'run', 'start'];
+      
+    case 'format':
+      return [packageManager, 'run', 'format'];
+      
+    case 'clean':
+      return [packageManager, 'run', 'clean'];
+      
+    case 'watch':
+      return [packageManager, 'run', 'watch'];
+      
+    case 'serve':
+      return [packageManager, 'run', 'serve'];
+      
+    case 'preview':
+      return [packageManager, 'run', 'preview'];
+      
+    case 'check':
+      return [packageManager, 'run', 'check'];
       
     default:
       console.error(`Error: "${command}" is not a supported command.`);
